@@ -57,8 +57,9 @@ if (!$filePath) {
 
 
 // - - - - - READ ORIGINAL CODE - - - - -
-
+$php_tag = '<?php' . PHP_EOL;
 $code   = file_get_contents($filePath);
+$code = $php_tag . $code;
 $tokens = token_get_all($code);
 
 
@@ -140,7 +141,8 @@ foreach ($replacements as $replacement) {
 
 
 // - - - - - OUTPUT/WRITE NEW CODE - - - - -
-
+// Remove the additional php tag.
+$code = substr_replace($code, '', 0, strlen($php_tag));
 if ($saveFile) {
     if ($replacements) {
         file_put_contents($filePath, $code);
