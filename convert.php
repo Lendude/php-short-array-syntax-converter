@@ -34,6 +34,7 @@
 
 $filePath = null;
 $saveFile = false;
+$patchFile = false;
 
 if ($argc > 3) {
     file_put_contents('php://stderr', 'Usage: php convert.php [-w] <file>' . "\n");
@@ -42,7 +43,9 @@ if ($argc > 3) {
 for ($i = 1; $i < $argc; ++$i) {
     if ($argv[$i] && $argv[$i][0] == '-') {
         $saveFile = ($argv[$i] == '-w');
-    } else {
+        $patchFile = ($argv[$i] == '-p');
+    }
+    else {
         $filePath = $argv[$i];
     }
 }
@@ -59,7 +62,9 @@ if (!$filePath) {
 // - - - - - READ ORIGINAL CODE - - - - -
 $php_tag = '<?php' . PHP_EOL;
 $code   = file_get_contents($filePath);
-$code = $php_tag . $code;
+if ($patchFile) {
+    $code = $php_tag . $code;
+}
 $tokens = token_get_all($code);
 
 
@@ -141,10 +146,16 @@ foreach ($replacements as $replacement) {
 
 
 // - - - - - OUTPUT/WRITE NEW CODE - - - - -
-// Remove the additional php tag.
-$code = substr_replace($code, '', 0, strlen($php_tag));
-if ($saveFile) {
+if ($patchFile) {
+    // Remove the additional php tag.
+    $code = substr_replace($code, '', 0, strlen($php_tag));
+}
+if ($saveFile || $patchFile) {
     if ($replacements) {
+        if ($patchFile) {
+            // Rewrite the file path to indicate we did a reroll.
+          $filePath = substr_replace($filePath, '-array-reroll', strrpos($filePath, '.'), 0);
+        }
         file_put_contents($filePath, $code);
         print count($replacements) . ' replacements.' . "\n";
     } else {
