@@ -16,6 +16,8 @@ Run the script with the path of the PHP file you wish to convert as argument. Th
     
 You can add the `-w` switch if you want to override the original file with the converted code.
 
+You can add the `-p` switch to indicate you are converting a patch file. This will output a file with `-array-reroll` added to the original file name.
+
 If you want the script to process PHP files with short open tags (`<?`) as well, you need to make sure that the [`short_open_tag`](http://php.net/manual/ini.core.php#ini.short-open-tag) setting is enabled in your `php.ini` file.
     
 In case of any error, an error message is written to STDERR and the script exits with a return code of 1.
